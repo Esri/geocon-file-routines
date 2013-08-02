@@ -1,0 +1,9 @@
+GEOCON - CONUS errors: NAD83-HARN to NAD83-NSRS2007
+Combines the NGS files: dela.b delo.b dev.b
+2012-08-12
+NAD_1983_HARN
+NAD_1983_NSRS2007
+error_files_bin/gc_nad83_harn_2007_conus_errors.gcb
+grid_pc/dela.b
+grid_pc/delo.b
+grid_pc/dev.b

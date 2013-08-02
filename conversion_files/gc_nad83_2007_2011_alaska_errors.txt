@@ -1,0 +1,9 @@
+GEOCON - Alaska errors: NAD83-NSRS2007 to NAD83-2011
+Combines the NGS files: delaa11.b deloa11.b deva11.b
+2012-08-12
+NAD_1983_NSRS2007
+NAD_1983_2011
+error_files_bin/gc_nad83_2007_2011_alaska_errors.gcb
+grid11_pc/delaa11.b
+grid11_pc/deloa11.b
+grid11_pc/deva11.b

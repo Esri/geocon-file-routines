@@ -1,0 +1,131 @@
+Contents of this package
+
+     CONTENTS           This file.
+     license.txt        The license for this package.
+     README.md          A readme file describing this package and its use.
+
+     makefile           A GNU makefile to build the GEOCON library and
+                        sample programs.
+
+     geocon_2008.sln    A Microsoft Visual Studio 2008 solution file
+                        to build the GEOCON library and sample programs.
+
+     geocon_2012.sln    A Microsoft Visual Studio 2012 solution file
+                        to build the GEOCON library and sample programs.
+
+   build/
+      makefile          A GNU makefile for this directory.
+
+      make_includes/
+         make*.i        GNU make include files.
+
+      vs_projects/
+         *.vcproj       Microsoft Visual Studio 2008 project files
+                        for the library and sample programs.
+
+         *.vcxproj*     Microsoft Visual Studio 2012 project files
+                        for the library and sample programs.
+
+   conversion_files/
+      *.txt             Conversion files used to combine the three original
+                        single-grid files into one multi-grid GEOCON file.
+
+                           gc_nad83_harn_2007_alaska_errors.txt
+                           gc_nad83_harn_2007_conus_errors.txt
+                           gc_nad83_harn_2007_prvi_errors.txt
+
+                           gc_nad83_harn_2007_alaska_shifts.txt
+                           gc_nad83_harn_2007_conus_shifts.txt
+                           gc_nad83_harn_2007_prvi_shifts.txt
+
+                           gc_nad83_2007_2011_alaska_errors.txt
+                           gc_nad83_2007_2011_conus_errors.txt
+                           gc_nad83_2007_2011_prvi_errors.txt
+
+                           gc_nad83_2007_2011_alaska_shifts.txt
+                           gc_nad83_2007_2011_conus_shifts.txt
+                           gc_nad83_2007_2011_prvi_shifts.txt
+
+   doc/
+     makefile           A GNU makefile for this directory.
+
+     doxyfile.txt       The configuration file used by the doxygen program
+                        to create the HTML documentation.
+                        (See www.doxygen.org for details.)
+
+     html/
+        *               The HTML documentation for the GEOCON library routines.
+                        This is for developers who wish to incorporate
+                        the GEOCON routines into their own programs.
+                        The top-level URL is "html/index.html".
+
+   etc/
+     makefile           A GNU makefile for this directory.
+     geocon_file.c      The source file for the "geocon_file" program.
+     geocon_cvt.c       The source file for the "geocon_cvt"  program.
+     geocon_cmb.c       The source file for the "geocon_cmb"  program.
+
+   include/
+     makefile           A GNU makefile for this directory.
+     libgeocon.h        The header file for the GEOCON routines.
+
+   shift_files_bin/
+     *.gcb              The combined binary multi-grid GEOCON shift files:
+
+                           gc_harn_2007_alaska_shifts.gcb
+                           gc_harn_2007_conus_shifts.gcb
+                           gc_harn_2007_prvi_shifts.gcb
+
+                           gc_2007_2011_alaska_shifts.gcb
+                           gc_2007_2011_conus_shifts.gcb
+                           gc_2007_2011_prvi_shifts.gcb
+
+                        Note that these files are written little-endian.
+
+   src/
+     makefile           A GNU makefile for this directory.
+     libgeocon.c        The source file for the GEOCON routines.
+
+Non-included shift files
+
+   We did not provide the ascii versions of the shift files, nor big-endian
+   versions of the binary shift files, as that would have vastly increased
+   the size of this package.  These can be created, however, from the
+   delivered binary files by using the geocon_file program.
+
+   For example:
+
+      To create an ascii version of the HARN-2007 alaska file:
+
+         geocon_file -o gc_harn_2007_alaska_shifts.gca \
+                        gc_harn_2007_alaska_shifts.gcb
+
+      To create a big-endian version of the HARN-2007 alaska file:
+
+         geocon_file -B -o gc_harn_2007_alaska_shifts_be.gcb \
+                           gc_harn_2007_alaska_shifts.gcb
+
+      To simply change the HARN-2007 alaska file to be big-endian:
+
+         geocon_file -B -o gc_harn_2007_alaska_shifts.gcb \
+                           gc_harn_2007_alaska_shifts.gcb
+
+   Note that the geocon_file and geocon_cvt programs can read any kind of
+   multi-grid GEOCON file (ascii, big-endian binary, or little-endian binary).
+
+Non-included error files
+
+   We did not bother to create or deliver any GEOCON error files, as they
+   are not used in a GIS environment and that would have doubled the size
+   of this package.  However, the geocon_file program can be used to create
+   them.  See the appropriate conversion file for details. Note that the
+   directory/path names may have to be changed.
+
+   For example, to create a binary version of the 2007 Alaska error file:
+
+      geocon_cmb gc_nad83_harn_2007_alaska_errors.txt
+
+   Note that the geocon_cmb program reads the original single-grid binary
+   files.  The user will have to download these files himself (from
+   http://beta.ngs.noaa.gov/GEOCON/).
+

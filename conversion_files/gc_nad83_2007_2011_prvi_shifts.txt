@@ -1,0 +1,9 @@
+GEOCON - PR/VI shifts: NAD83-NSRS2007 to NAD83-2011
+Combines the NGS files: dslap11.b dslop11.b dsvp11.b
+2012-08-12
+NAD_1983_NSRS2007
+NAD_1983_2011
+shift_files_bin/gc_nad83_2007_2011_prvi_shifts.gcb
+grid11_pc/dslap11.b
+grid11_pc/dslop11.b
+grid11_pc/dsvp11.b

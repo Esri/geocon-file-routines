@@ -1,0 +1,9 @@
+GEOCON - CONUS shifts: NAD83-NSRS2007 to NAD83-2011
+Combines the NGS files: dsla11.b dslo11.b dsv11.b
+2012-08-12
+NAD_1983_NSRS2007
+NAD_1983_2011
+shift_files_bin/gc_nad83_2007_2011_conus_shifts.gcb
+grid11_pc/dsla11.b
+grid11_pc/dslo11.b
+grid11_pc/dsv11.b

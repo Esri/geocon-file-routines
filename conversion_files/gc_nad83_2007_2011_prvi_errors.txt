@@ -1,0 +1,9 @@
+GEOCON - PR/VI errors: NAD83-NSRS2007 to NAD83-2011
+Combines the NGS files: delap11.b delop11.b devp11.b
+2012-08-12
+NAD_1983_NSRS2007
+NAD_1983_2011
+error_files_bin/gc_nad83_2007_2011_prvi_errors.gcb
+grid11_pc/delap11.b
+grid11_pc/delop11.b
+grid11_pc/devp11.b

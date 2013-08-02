@@ -1,0 +1,9 @@
+GEOCON - CONUS errors: NAD83-NSRS2007 to NAD83-2011
+Combines the NGS files: dela11.b delo11.b dev11.b
+2012-08-12
+NAD_1983_NSRS2007
+NAD_1983_2011
+error_files_bin/gc_nad83_2007_2011_conus_errors.gcb
+grid11_pc/dela11.b
+grid11_pc/delo11.b
+grid11_pc/dev11.b

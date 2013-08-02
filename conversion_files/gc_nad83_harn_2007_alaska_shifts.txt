@@ -1,0 +1,9 @@
+GEOCON - Alaska shifts: NAD83-HARN to NAD83-NSRS2007
+Combines the NGS files: dslaa.b dsloa.b dsva.b
+2012-08-12
+NAD_1983_HARN
+NAD_1983_NSRS2007
+shift_files_bin/gc_nad83_harn_2007_alaska_shifts.gcb
+grid_pc/dslaa.b
+grid_pc/dsloa.b
+grid_pc/dsva.b

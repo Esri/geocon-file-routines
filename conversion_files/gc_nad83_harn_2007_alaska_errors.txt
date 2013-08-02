@@ -1,0 +1,9 @@
+GEOCON - Alaska errors: NAD83-HARN to NAD83-NSRS2007
+Combines the NGS files: delaa.b deloa.b deva.b
+2012-08-12
+NAD_1983_HARN
+NAD_1983_NSRS2007
+error_files_bin/gc_nad83_harn_2007_alaska_errors.gcb
+grid_pc/delaa.b
+grid_pc/deloa.b
+grid_pc/deva.b
