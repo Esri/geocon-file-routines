@@ -174,52 +174,52 @@ Both a GCB file and a GCA file have the same contents, but the syntax is
 different. Note that either format can be used to store either shift or
 error values.
 
-   #### Binary (GCB) file
+#### Binary (GCB) file
 
-   The syntax of a binary header is:
+The syntax of a binary header is:
 
-   <pre>
-      Field name       Type      Description
-      ---------------  --------  --------------------------------------
-      magic            int       File magic number (0x47434f4e) ('GCON')
-      version          int       Header version
-      hdrlen           int       Header length
-      reserved         int       Reserved - should be 0
+<pre>
+   Field name       Type      Description
+   ---------------  --------  --------------------------------------
+   magic            int       File magic number (0x47434f4e) ('GCON')
+   version          int       Header version
+   hdrlen           int       Header length
+   reserved         int       Reserved - should be 0
 
-      info             char[80]  File description
-      source           char[80]  Source of this data
-      date             char[24]  Date: "YYYY-MM-DD[ HH:MM:SS]"
+   info             char[80]  File description
+   source           char[80]  Source of this data
+   date             char[24]  Date: "YYYY-MM-DD[ HH:MM:SS]"
 
-      lat_dir          int       Dir of lat values (S-N or N-S) (0 or 1)
-      lon_dir          int       Dir of lon values (W-E or E-W) (0 or 1)
+   lat_dir          int       Dir of lat values (S-N or N-S) (0 or 1)
+   lon_dir          int       Dir of lon values (W-E or E-W) (0 or 1)
 
-      nrows            int       Number of rows in data
-      ncols            int       Number of cols in data
+   nrows            int       Number of rows in data
+   ncols            int       Number of cols in data
 
-      lat_south        double    South latitude  ( -90 to  +90) degs
-      lat_north        double    North latitude  ( -90 to  +90) degs
+   lat_south        double    South latitude  ( -90 to  +90) degs
+   lat_north        double    North latitude  ( -90 to  +90) degs
 
-      lon_west         double    West  longitude (-180 to +180) degs
-      lon_east         double    East  longitude (-180 to +180) degs
+   lon_west         double    West  longitude (-180 to +180) degs
+   lon_east         double    East  longitude (-180 to +180) degs
 
-      lat_delta        double    Latitude  increment in degrees
-      lon_delta        double    Longitude increment in degrees
+   lat_delta        double    Latitude  increment in degrees
+   lon_delta        double    Longitude increment in degrees
 
-      horz_scale       double    Horizontal units per degree
-      vert_scale       double    Vertical   units per meter
+   horz_scale       double    Horizontal units per degree
+   vert_scale       double    Vertical   units per meter
 
-      from_gcs         char[80]  From geographic coordinate system name
-      from_vcs         char[80]  From vertical   coordinate system name
-      from_semi_major  double    From ellipsoid semi-major axis
-      from_flattening  double    From ellipsoid inverse flattening
+   from_gcs         char[80]  From geographic coordinate system name
+   from_vcs         char[80]  From vertical   coordinate system name
+   from_semi_major  double    From ellipsoid semi-major axis
+   from_flattening  double    From ellipsoid inverse flattening
 
-      to_gcs           char[80]  To   geographic coordinate system name
-      to_vcs           char[80]  To   vertical   coordinate system name
-      to_semi_major    double    To   ellipsoid semi-major axis
-      to_flattening    double    To   ellipsoid inverse flattening
-      ---------------            ----------------------
-      total size                 632 bytes
-   </pre>
+   to_gcs           char[80]  To   geographic coordinate system name
+   to_vcs           char[80]  To   vertical   coordinate system name
+   to_semi_major    double    To   ellipsoid semi-major axis
+   to_flattening    double    To   ellipsoid inverse flattening
+   ---------------            ----------------------
+   total size                 632 bytes
+</pre>
 
    All string lengths include the nul-terminator. String fields should be
    zero-padded on the right.
@@ -230,136 +230,136 @@ error values.
 
    The data section consists of (nrows * ncols) data points:
 
-   <pre>
-      Field name       Type      Description
-      ---------------  --------  --------------------------------------
-      lat_value        float     Latitude  shift-or-error value
-      lon_value        float     Longitude shift-or-error value
-      hgt-value        float     Height    shift-or-error value
-   </pre>
+<pre>
+   Field name       Type      Description
+   ---------------  --------  --------------------------------------
+   lat_value        float     Latitude  shift-or-error value
+   lon_value        float     Longitude shift-or-error value
+   hgt-value        float     Height    shift-or-error value
+</pre>
 
-   #### ASCII (GCA) file
+#### ASCII (GCA) file
 
-   Rules for ascii files are:
+Rules for ascii files are:
 
-      1.  Anything following a # will be considered a comment and will
-          be discarded.
+   1.  Anything following a # will be considered a comment and will
+       be discarded.
 
-      2.  Whitespace is used to delimit tokens in each line, and extraneous
-          whitespace outside of quotes is ignored.
+   2.  Whitespace is used to delimit tokens in each line, and extraneous
+       whitespace outside of quotes is ignored.
 
-      3.  Blank lines are discarded. This is done after removing any comments
-          and all leading and trailing whitespace.
+   3.  Blank lines are discarded. This is done after removing any comments
+       and all leading and trailing whitespace.
 
-      4.  Any string value longer than the field width is silently truncated.
-          Maximum field withs are:
-             info      79 chars
-             source    79 chars
-             date      23 chars
-             from_gcs  79 chars
-             from_vcs  79 chars
-             to_gcs    79 chars
-             to_vcs    79 chars
+   4.  Any string value longer than the field width is silently truncated.
+       Maximum field withs are:
+          info      79 chars
+          source    79 chars
+          date      23 chars
+          from_gcs  79 chars
+          from_vcs  79 chars
+          to_gcs    79 chars
+          to_vcs    79 chars
 
-      5.  Header line entries have the syntax:
-             field-name  field-value
+   5.  Header line entries have the syntax:
+          field-name  field-value
 
-          Point line entries have the syntax:
-             latitude-value longitude-value height-value
+       Point line entries have the syntax:
+          latitude-value longitude-value height-value
 
-      6.  All floating point numbers are displayed with a '.' as the
-          decimal separator. This is because these files could be used
-          anywhere, and so should be locale-neutral.
+   6.  All floating point numbers are displayed with a '.' as the
+       decimal separator. This is because these files could be used
+       anywhere, and so should be locale-neutral.
 
-          Text files will be read in properly even if decimal separators
-          other than a '.' are used (and they match the separators for
-          the current locale), but they will always be written out using a
-          decimal point. This allows ease in creating an ascii file using
-          programs that can't output locale-neutral number strings.
+       Text files will be read in properly even if decimal separators
+       other than a '.' are used (and they match the separators for
+       the current locale), but they will always be written out using a
+       decimal point. This allows ease in creating an ascii file using
+       programs that can't output locale-neutral number strings.
 
-      7.  String values should be enclosed in quotes if they contain any
-          whitespace.
+   7.  String values should be enclosed in quotes if they contain any
+       whitespace.
 
-   The syntax of an ASCII header is:
+The syntax of an ASCII header is:
 
-   <pre>
-      Token            Description
-      ---------------  --------------------------------------
-      info             "Description"
-      source           "Source of the data"
-      date             "YYYY-MM-DD"
+<pre>
+   Token            Description
+   ---------------  --------------------------------------
+   info             "Description"
+   source           "Source of the data"
+   date             "YYYY-MM-DD"
 
-      lat_dir          "S-N" or "N-S"
-      lon_dir          "W-E" or "E-W"
+   lat_dir          "S-N" or "N-S"
+   lon_dir          "W-E" or "E-W"
 
-      nrows            number of rows
-      ncols            number of columns
+   nrows            number of rows
+   ncols            number of columns
 
-      lat_south        South latitude
-      lat_north        North latitude
+   lat_south        South latitude
+   lat_north        North latitude
 
-      lon_west         West  longitude
-      lon_east         East  longitude
+   lon_west         West  longitude
+   lon_east         East  longitude
 
-      lat_delta        Latitude  increment
-      lon_delta        Longitude increment
+   lat_delta        Latitude  increment
+   lon_delta        Longitude increment
 
-      horz_scale       horizontal units-per-degree
-      vert_scale       vertical   units-per-meter
+   horz_scale       horizontal units-per-degree
+   vert_scale       vertical   units-per-meter
 
-      from_gcs         From geographic coordinate system name
-      from_vcs         From vertical   coordinate system name
-      from_semi_major  From ellipsoid semimajor axis
-      from_flattening  From ellipsoid inverse flattening
+   from_gcs         From geographic coordinate system name
+   from_vcs         From vertical   coordinate system name
+   from_semi_major  From ellipsoid semimajor axis
+   from_flattening  From ellipsoid inverse flattening
 
-      to_gcs           To   geographic coordinate system name
-      to_vcs           To   vertical   coordinate system name
-      to_semi_major    To   ellipsoid semimajor axis
-      to_flattening    To   ellipsoid inverse flattening
-   </pre>
+   to_gcs           To   geographic coordinate system name
+   to_vcs           To   vertical   coordinate system name
+   to_semi_major    To   ellipsoid semimajor axis
+   to_flattening    To   ellipsoid inverse flattening
+</pre>
 
-   The data section consists of (nrows * ncols) lines:
+The data section consists of (nrows * ncols) lines:
 
-   <pre>
-      latitude-shift  longitude-shift  height-shift
-   </pre>
+<pre>
+   latitude-shift  longitude-shift  height-shift
+</pre>
 
-   Example (from the gc_nad83_2007_2011_prvi_shifts.gca file):
+Example (from the gc_nad83_2007_2011_prvi_shifts.gca file):
 
-   <pre>
-      info             "GEOCON - PR/VI shifts: NAD83-NSRS2007 to NAD83-2011"
-      source           "Combines the NGS files: dslap11.b dslop11.b dsvp11.b"
-      date             "2012-08-12"
+<pre>
+   info             "GEOCON - PR/VI shifts: NAD83-NSRS2007 to NAD83-2011"
+   source           "Combines the NGS files: dslap11.b dslop11.b dsvp11.b"
+   date             "2012-08-12"
 
-      lat_dir          S-N
-      lon_dir          W-E
-      nrows            181
-      ncols            361
+   lat_dir          S-N
+   lon_dir          W-E
+   nrows            181
+   ncols            361
 
-      lat_south        17
-      lat_north        20
-      lon_west         -68
-      lon_east         -62
-      lat_delta        0.016666666666666666
-      lon_delta        0.016666666666666666
+   lat_south        17
+   lat_north        20
+   lon_west         -68
+   lon_east         -62
+   lat_delta        0.016666666666666666
+   lon_delta        0.016666666666666666
 
-      horz_scale       360000000
-      vert_scale       100
+   horz_scale       360000000
+   vert_scale       100
 
-      from_gcs         "NAD_1983_NSRS2007"
-      from_vcs         "NAD_1983"
-      from_semi_major  6378137
-      from_flattening  298.25722210100002
+   from_gcs         "NAD_1983_NSRS2007"
+   from_vcs         "NAD_1983"
+   from_semi_major  6378137
+   from_flattening  298.25722210100002
 
-      to_gcs           "NAD_1983_2011"
-      to_vcs           "NAD_1983"
-      to_semi_major    6378137
-      to_flattening    298.25722210100002
+   to_gcs           "NAD_1983_2011"
+   to_vcs           "NAD_1983"
+   to_semi_major    6378137
+   to_flattening    298.25722210100002
 
-      105.0           500.0           1.299999952
-      104.999984741   500.000061035   1.299992442
-      ...
-   </pre>
+   105.0           500.0           1.299999952
+   104.999984741   500.000061035   1.299992442
+   ...
+</pre>
 
 ### The "geocon_file" program
 
