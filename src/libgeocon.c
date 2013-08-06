@@ -24,18 +24,9 @@
 #include <math.h>
 #include <ctype.h>
 #include <locale.h>
+
 #include "libgeocon.h"
-
-#define GEOCON_UNUSED_PARAMETER(p)  ((void)p)
-
-/* ------------------------------------------------------------------------- */
-/* version info                                                              */
-/* ------------------------------------------------------------------------- */
-
-#define GEOCON_VERSION_MAJOR     1
-#define GEOCON_VERSION_MINOR     0
-#define GEOCON_VERSION_RELEASE   0
-#define GEOCON_VERSION_STR       "1.0.0"
+#include "libgeocon.i"
 
 /* ------------------------------------------------------------------------- */
 /* floating-point comparison macros                                          */
@@ -109,54 +100,13 @@ static const GEOCON_ERRS gc_errlist[] =
 };
 
 /* ------------------------------------------------------------------------- */
-/* mutex processing (not yet implemented)                                    */
+/* String routines                                                           */
 /* ------------------------------------------------------------------------- */
 
-static void * gc_mutex_create()
-{
-   return GEOCON_NULL;
-}
-
-static void gc_mutex_delete(void *mp)
-{
-   GEOCON_UNUSED_PARAMETER(mp);
-}
-
-static void gc_mutex_enter (void *mp)
-{
-   GEOCON_UNUSED_PARAMETER(mp);
-}
-
-static void gc_mutex_leave (void *mp)
-{
-   GEOCON_UNUSED_PARAMETER(mp);
-}
-
-/* ------------------------------------------------------------------------- */
-/* string processing                                                         */
-/* ------------------------------------------------------------------------- */
-
-/*------------------------------------------------------------------------
- * TOKEN struct
- */
-#define GC_TOKENS_MAX     64
-#define GC_TOKENS_BUFLEN  256
-
-typedef struct gc_token GC_TOKEN;
-struct gc_token
-{
-   char   buf[GC_TOKENS_BUFLEN];
-   char * toks[GC_TOKENS_MAX];
-   int    num;
-};
-
-/*------------------------------------------------------------------------
- * strip a string of all leading/trailing whitespace
- */
 static char * gc_strip(char *str)
 {
    char * s;
-   char * e = NULL;
+   char * e = GEOCON_NULL;
 
    for (; isspace(*str); str++) ;
 
@@ -166,7 +116,7 @@ static char * gc_strip(char *str)
          e = s;
    }
 
-   if ( e != NULL )
+   if ( e != GEOCON_NULL )
       e[1] = 0;
    else
       *str = 0;
@@ -183,40 +133,27 @@ static char * gc_strip_buf(char *str)
    return str;
 }
 
-/*------------------------------------------------------------------------
- * case insensitive version of strcmp()
- *
- * This routine treats '-' as '_'.
- */
-static int gc_strcmp_i (const char *s1, const char *s2)
+static int gc_strcmp_i(const char *s1, const char *s2)
 {
-   const unsigned char * u1 = (const unsigned char *)s1;
-   const unsigned char * u2 = (const unsigned char *)s2;
-
    for (;;)
    {
-      register int c1 = toupper(*u1);
-      register int c2 = toupper(*u2);
-      register int rc;
-
-      /* treat '-' as '_' */
-      if (c1 == '-')  c1 = '_';
-      if (c2 == '-')  c2 = '_';
+      int c1 = toupper(*(const unsigned char *)s1);
+      int c2 = toupper(*(const unsigned char *)s2);
+      int rc;
 
       rc = (c1 - c2);
-      if (rc != 0 || c1 == 0 || c2 == 0)
+      if ( rc != 0 || c1 == 0 || c2 == 0 )
          return (rc);
 
-      u1++;
-      u2++;
+      s1++;
+      s2++;
    }
 }
 
-/*------------------------------------------------------------------------
- * Like strncpy(), but guarantees a null-terminated string
+/* Like strncpy(), but guarantees a null-terminated string
  * and returns number of chars copied.
  */
-static int gc_strncpy (char *buf, const char *str, int n)
+static int gc_strncpy(char *buf, const char *str, int n)
 {
    char * b = buf;
    const char *s;
@@ -228,8 +165,22 @@ static int gc_strncpy (char *buf, const char *str, int n)
    return (int)(b - buf);
 }
 
-/*------------------------------------------------------------------------
- * tokenize a buffer
+/* ------------------------------------------------------------------------- */
+/* String tokenizing                                                         */
+/* ------------------------------------------------------------------------- */
+
+#define GEOCON_TOKENS_MAX     64
+#define GEOCON_TOKENS_BUFLEN  256
+
+typedef struct gc_token GEOCON_TOKEN;
+struct gc_token
+{
+   char   buf  [GEOCON_TOKENS_BUFLEN];
+   char * toks [GEOCON_TOKENS_MAX];
+   int    num;
+};
+
+/* tokenize a buffer
  *
  * This routine splits a line into "tokens", based on the delimiter
  * string.  Each token will have all leading/trailing whitespace
@@ -248,7 +199,7 @@ static int gc_strncpy (char *buf, const char *str, int n)
  * Note that this routine does not yet support "escaped" chars (\x).
  */
 static int gc_str_tokenize(
-   GC_TOKEN   *ptoks,
+   GEOCON_TOKEN *ptoks,
    const char *line,
    const char *delims,
    int         maxtoks)
@@ -262,8 +213,8 @@ static int gc_str_tokenize(
    if ( ptoks == GEOCON_NULL )
       return 0;
 
-   if ( maxtoks <= 0 || ntoks > GC_TOKENS_MAX )
-      maxtoks = GC_TOKENS_MAX;
+   if ( maxtoks <= 0 || ntoks > GEOCON_TOKENS_MAX )
+      maxtoks = GEOCON_TOKENS_MAX;
 
    if ( line   == GEOCON_NULL )  line   = "";
    if ( delims == GEOCON_NULL )  delims = "";
@@ -271,8 +222,6 @@ static int gc_str_tokenize(
    /* copy the line, removing any leading/trailing whitespace */
 
    gc_strncpy(ptoks->buf, line, sizeof(ptoks->buf));
-   ptoks->buf[sizeof(ptoks->buf)-1] = 0;
-
    gc_strip_buf(ptoks->buf);
    ptoks->num = 0;
 
@@ -334,19 +283,69 @@ static int gc_str_tokenize(
 
       if ( (c == '\'' || c == '"') && str[len-1] == c )
       {
-         gc_strncpy(str, str+1, len-2);
-         str[len-2] = 0;
+         str[len-1] = 0;
+         ptoks->toks[i] = ++str;
          gc_strip_buf(str);
       }
    }
 
    /* set rest of requested tokens to empty string */
-
    for (i = ntoks; i < maxtoks; i++)
-      ptoks->toks[i] = &ptoks->buf[sizeof(ptoks->buf)-1];
+      ptoks->toks[i] = "";
 
    ptoks->num = ntoks;
    return ntoks;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Byte swapping routines                                                    */
+/* ------------------------------------------------------------------------- */
+
+static GEOCON_BOOL gc_is_big_endian(void)
+{
+   int one = 1;
+
+   return ( *((char *)&one) == 0 );
+}
+
+static GEOCON_BOOL gc_is_ltl_endian(void)
+{
+   return ! gc_is_big_endian();
+}
+
+#define SWAP4(a) \
+   ( (((a) & 0x000000ff) << 24) | \
+     (((a) & 0x0000ff00) <<  8) | \
+     (((a) & 0x00ff0000) >>  8) | \
+     (((a) & 0xff000000) >> 24) )
+
+static void gc_swap_int(int in[], int ntimes)
+{
+   int i;
+
+   for (i = 0; i < ntimes; i++)
+      in[i] = SWAP4((unsigned int)in[i]);
+}
+
+static void gc_swap_flt(float in[], int ntimes)
+{
+  gc_swap_int((int *)in, ntimes);
+}
+
+static void gc_swap_dbl(double in[], int ntimes)
+{
+   int  i;
+   int *p_int, tmpint;
+
+   for (i = 0; i < ntimes; i++)
+   {
+      p_int = (int *)(&in[i]);
+      gc_swap_int(p_int, 2);
+
+      tmpint   = p_int[0];
+      p_int[0] = p_int[1];
+      p_int[1] = tmpint;
+   }
 }
 
 /*------------------------------------------------------------------------
@@ -411,86 +410,6 @@ static char * gc_dtoa(char *buf, double dbl)
    }
 
    return buf;
-}
-
-/* ------------------------------------------------------------------------- */
-/* generic utility routines                                                  */
-/* ------------------------------------------------------------------------- */
-
-/*------------------------------------------------------------------------
- * memory routines
- *
- * These routines are abstracted here in order to provide an implementer
- * the ability to plug in their own memory routines.
- */
-static void * gc_memalloc(size_t n)
-{
-   return malloc(n);
-}
-
-static void gc_memdealloc(void *p)
-{
-   if ( p != GEOCON_NULL )
-   {
-      free(p);
-   }
-}
-
-/*------------------------------------------------------------------------
- * check if big/little endian
- */
-static GEOCON_BOOL gc_is_big_endian(void)
-{
-   int one = 1;
-
-   return ( *((char *)&one) == 0 );
-}
-
-static GEOCON_BOOL gc_is_ltl_endian(void)
-{
-   return ! gc_is_big_endian();
-}
-
-/*------------------------------------------------------------------------
- * byte swapping routines
- */
-#define GEOCON_SWAP4(a) \
-   ( (((a) & 0x000000ff) << 24) | \
-     (((a) & 0x0000ff00) <<  8) | \
-     (((a) & 0x00ff0000) >>  8) | \
-     (((a) & 0xff000000) >> 24) )
-
-static void gc_swap_int(int in[], int ntimes)
-{
-   unsigned int * uin = (unsigned int *)in;
-   int i;
-
-   for (i = 0; i < ntimes; i++)
-   {
-      uin[i] = GEOCON_SWAP4(uin[i]);
-   }
-}
-
-static void gc_swap_flt(float in[], int ntimes)
-{
-  gc_swap_int((int *)in, ntimes);
-}
-
-static void gc_swap_dbl(double in[], int ntimes)
-{
-   int *p_int;
-   int  tmpint;
-   int  i;
-
-   for (i = 0; i < ntimes; i++)
-   {
-      p_int = (int *)(&in[i]);
-      gc_swap_int(p_int, 2);
-
-      tmpint   = p_int[0];
-      p_int[0] = p_int[1];
-      p_int[1] = tmpint;
-   }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -624,9 +543,9 @@ static char * gc_read_line(GEOCON_HDR *hdr, char *buf, size_t buflen)
  *
  * Returns number of tokens or -1 at EOF
  */
-static int gc_read_toks(GEOCON_HDR *hdr, GC_TOKEN *ptok, int maxtoks)
+static int gc_read_toks(GEOCON_HDR *hdr, GEOCON_TOKEN *ptok, int maxtoks)
 {
-   char  buf[GC_TOKENS_BUFLEN];
+   char  buf[GEOCON_TOKENS_BUFLEN];
    char *bufp;
 
    bufp = gc_read_line(hdr, buf, sizeof(buf));
@@ -690,7 +609,7 @@ static int gc_load_hdr_asc(
    int        *prc)
 {
    GEOCON_FILE_HDR * fhdr = &hdr->fhdr;
-   GC_TOKEN tok;
+   GEOCON_TOKEN tok;
 
    RT(2); gc_strncpy( fhdr->info,           TOK(1), sizeof(fhdr->info)   );
    RT(2); gc_strncpy( fhdr->source,         TOK(1), sizeof(fhdr->source) );
@@ -1094,7 +1013,7 @@ static int gc_load_data_asc(
    GEOCON_EXTENT *ext,
    int           *prc)
 {
-   GC_TOKEN tok;
+   GEOCON_TOKEN tok;
    int r;
    int c;
    int rc = 0;

@@ -75,8 +75,9 @@ HDRS  := \
   $(NULL)
 
 OTHER := \
-  libgeocon.rc  \
   libgeocon.def \
+  libgeocon.i   \
+  libgeocon.rc  \
   $(NULL)
 
 CHSRC   := $(C_SRC) $(HDRS)
