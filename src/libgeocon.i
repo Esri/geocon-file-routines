@@ -18,32 +18,6 @@
 /* These routines are separated out so they may be replaced by the user.     */
 /* ------------------------------------------------------------------------- */
 
-#define GEOCON_UNUSED_PARAMETER(p)  (void)(p)
-
-/* ------------------------------------------------------------------------- */
-/* Mutex routines                                                            */
-/* ------------------------------------------------------------------------- */
-
-static void * gc_mutex_create()
-{
-   return GEOCON_NULL;
-}
-
-static void gc_mutex_delete(void *mp)
-{
-   GEOCON_UNUSED_PARAMETER(mp);
-}
-
-static void gc_mutex_enter (void *mp)
-{
-   GEOCON_UNUSED_PARAMETER(mp);
-}
-
-static void gc_mutex_leave (void *mp)
-{
-   GEOCON_UNUSED_PARAMETER(mp);
-}
-
 /* ------------------------------------------------------------------------- */
 /* Memory routines                                                           */
 /* ------------------------------------------------------------------------- */
@@ -58,5 +32,145 @@ static void gc_memdealloc(void *p)
    if ( p != GEOCON_NULL )
    {
       free(p);
+   }
+}
+
+/* ------------------------------------------------------------------------- */
+/* Mutex routines                                                            */
+/* ------------------------------------------------------------------------- */
+
+typedef struct geocon_critsect GEOCON_CRITSECT;
+
+#if defined(GEOCON_NO_MUTEXES)
+
+   struct geocon_critsect
+   {
+      int foo;
+   };
+
+#  define GEOCON_CS_CREATE(cs)
+#  define GEOCON_CS_DELETE(cs)
+#  define GEOCON_CS_ENTER(cs)
+#  define GEOCON_CS_LEAVE(cs)
+
+#elif defined(_WIN32)
+
+#  define  WIN32_LEAN_AND_MEAN   /* Exclude rarely-used stuff */
+#  include <windows.h>
+   /* Note that Windows mutexes are always recursive.
+   */
+   struct geocon_critsect
+   {
+      CRITICAL_SECTION   crit;
+   };
+
+# if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#  define GEOCON_CS_CREATE(cs) \
+      InitializeCriticalSectionEx (&cs.crit, 4000, 0)
+# elif defined(WINCE)
+#  define GEOCON_CS_CREATE(cs) \
+      InitializeCriticalSection   (&cs.crit)
+# else
+#  define GEOCON_CS_CREATE(cs) \
+      InitializeCriticalSectionAndSpinCount(&cs.crit, 4000)
+# endif
+#  define GEOCON_CS_DELETE(cs) \
+      DeleteCriticalSection       (&cs.crit)
+#  define GEOCON_CS_ENTER(cs)  \
+      EnterCriticalSection        (&cs.crit)
+#  define GEOCON_CS_LEAVE(cs)  \
+      LeaveCriticalSection        (&cs.crit)
+
+#else
+
+#  include <pthread.h>
+   /* In Unix we always use POSIX threads & mutexes.
+      We also make sure that our mutexes are recursive
+      (by default, POSIX mutexes are not recursive).
+   */
+   struct geocon_critsect
+   {
+      pthread_mutex_t       crit;
+      pthread_mutexattr_t   attr;
+   };
+
+#  if linux
+#    define MUTEX_RECURSIVE   PTHREAD_MUTEX_RECURSIVE_NP
+#  else
+#    define MUTEX_RECURSIVE   PTHREAD_MUTEX_RECURSIVE
+#  endif
+
+#  define GEOCON_CS_CREATE(cs)   \
+      pthread_mutexattr_init    (&cs.attr);                  \
+      pthread_mutexattr_settype (&cs.attr, MUTEX_RECURSIVE); \
+      pthread_mutex_init        (&cs.crit, &cs.attr)
+
+#  define GEOCON_CS_DELETE(cs)   \
+      pthread_mutex_destroy     (&cs.crit); \
+      pthread_mutexattr_destroy (&cs.attr)
+
+#  define GEOCON_CS_ENTER(cs)   \
+      pthread_mutex_lock        (&cs.crit)
+
+#  define GEOCON_CS_LEAVE(cs)   \
+      pthread_mutex_unlock      (&cs.crit)
+
+#endif /* OS-specific stuff */
+
+typedef struct geocon_mutex_t GEOCON_MUTEX_T;
+struct geocon_mutex_t
+{
+   GEOCON_CRITSECT  cs;
+   int              count;
+};
+
+static void * gc_mutex_create()
+{
+   GEOCON_MUTEX_T * m = (GEOCON_MUTEX_T *)gc_memalloc(sizeof(*m));
+
+   if ( m != GEOCON_NULL )
+   {
+      m->count = 0;
+      GEOCON_CS_CREATE(m->cs);
+   }
+
+   return (void *)m;
+}
+
+static void gc_mutex_enter (void *mp)
+{
+   GEOCON_MUTEX_T * m = (GEOCON_MUTEX_T *)mp;
+
+   if ( m != GEOCON_NULL )
+   {
+      GEOCON_CS_ENTER(m->cs);
+      m->count++;
+   }
+}
+
+static void gc_mutex_leave (void *mp)
+{
+   GEOCON_MUTEX_T * m = (GEOCON_MUTEX_T *)mp;
+
+   if ( m != GEOCON_NULL )
+   {
+      m->count--;
+      GEOCON_CS_LEAVE(m->cs);
+   }
+}
+
+static void gc_mutex_delete(void *mp)
+{
+   GEOCON_MUTEX_T * m = (GEOCON_MUTEX_T *)mp;
+
+   if ( m != GEOCON_NULL )
+   {
+      while (m->count > 0)
+      {
+         gc_mutex_leave(m);
+      }
+      GEOCON_CS_DELETE(m->cs);
+
+      gc_memdealloc(m);
    }
 }

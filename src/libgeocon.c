@@ -28,18 +28,20 @@
 #include "libgeocon.h"
 #include "libgeocon.i"
 
+#define GEOCON_UNUSED_PARAMETER(p) (void)(p);
+
 /* ------------------------------------------------------------------------- */
 /* floating-point comparison macros                                          */
 /* ------------------------------------------------------------------------- */
 
-#define GEOCON_EPS48           3.55271367880050092935562e-15 /* 2^(-48) */
-#define GEOCON_EPS49           1.77635683940025046467781e-15 /* 2^(-49) */
-#define GEOCON_EPS50           8.88178419700125232338905e-16 /* 2^(-50) */
-#define GEOCON_EPS51           4.44089209850062616169453e-16 /* 2^(-51) */
-#define GEOCON_EPS52           2.22044604925031308084726e-16 /* 2^(-52) */
-#define GEOCON_EPS53           1.11022302462515654042363e-16 /* 2^(-53) */
+#define GEOCON_EPS_48          3.55271367880050092935562e-15 /* 2^(-48) */
+#define GEOCON_EPS_49          1.77635683940025046467781e-15 /* 2^(-49) */
+#define GEOCON_EPS_50          8.88178419700125232338905e-16 /* 2^(-50) */
+#define GEOCON_EPS_51          4.44089209850062616169453e-16 /* 2^(-51) */
+#define GEOCON_EPS_52          2.22044604925031308084726e-16 /* 2^(-52) */
+#define GEOCON_EPS_53          1.11022302462515654042363e-16 /* 2^(-53) */
 
-#define GEOCON_EPS             GEOCON_EPS51  /* best compromise between */
+#define GEOCON_EPS             GEOCON_EPS_51 /* best compromise between */
                                              /* speed and accuracy      */
 
 #define GEOCON_ABS(a)          ( ((a) < 0) ? -(a) : (a) )
