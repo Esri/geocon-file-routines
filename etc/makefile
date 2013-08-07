@@ -85,7 +85,7 @@ ALLSRC  = makefile $(DIRSRC)
 ifeq ($(OS_TYPE), windows)
   LIBS   := libgeocon$(LIB_SUFFIX).$(LIB_EXT)
 else
-  LIBS   := -libgeocon$(LIB_SUFFIX)
+  LIBS   := -lgeocon$(LIB_SUFFIX)
 endif
 
 LIBS_DEP := $(LIB_DIR)/libgeocon$(LIB_SUFFIX).$(LIB_D_EXT)
