@@ -227,7 +227,6 @@ struct geocon_hdr
       for multi-threaded access to the file when
       transforming points and reading data on-the-fly.
       This mutex does not need to be recursive.
-      This is currently not implemented.
    */
    void *        mutex;            /*!< MUTEX for reading                    */
 
@@ -389,10 +388,10 @@ extern GEOCON_HDR * geocon_load(
  * @return           0 if OK, -1 if error.
  */
 extern int geocon_write(
-   GEOCON_HDR    *hdr,
-   const char    *pathname,
-   int            byte_order,
-   int           *prc);
+   const GEOCON_HDR *hdr,
+   const char       *pathname,
+   int               byte_order,
+   int              *prc);
 
 /*---------------------------------------------------------------------------*/
 /**
@@ -403,7 +402,7 @@ extern int geocon_write(
  * @param hdr        A pointer to a GEOCON object.
  */
 extern void geocon_delete(
-   GEOCON_HDR    *hdr);
+   GEOCON_HDR *hdr);
 
 /*---------------------------------------------------------------------------*/
 /**
@@ -419,9 +418,9 @@ extern void geocon_delete(
  * @param do_hdr_line  TRUE to output a header line.
  */
 extern void geocon_list_hdr(
-   GEOCON_HDR    *hdr,
-   FILE          *fp,
-   GEOCON_BOOL    do_hdr_line);
+   const GEOCON_HDR *hdr,
+   FILE             *fp,
+   GEOCON_BOOL       do_hdr_line);
 
 /*---------------------------------------------------------------------------*/
 /**
@@ -435,8 +434,8 @@ extern void geocon_list_hdr(
  *                     If NULL, no dump will be done.
  */
 extern void geocon_dump_hdr(
-   GEOCON_HDR    *hdr,
-   FILE          *fp);
+   const GEOCON_HDR *hdr,
+   FILE             *fp);
 
 /*---------------------------------------------------------------------------*/
 /**
@@ -447,17 +446,12 @@ extern void geocon_dump_hdr(
  * @param fp           The stream to dump it to, typically stdout.
  *                     If NULL, no dump will be done.
  *
- * @param ext          An optional extent to limit the data by.
- *                     If NULL, all data will be dumped.
- *                     If the extent is invalid, no data will be dumped.
- *
  * <p>Note that the data is always dumped with latitudes going south-to-north
  * and longitudes going west-to-east.
  */
 extern void geocon_dump_data(
-   GEOCON_HDR    *hdr,
-   FILE          *fp,
-   GEOCON_EXTENT *ext);
+   const GEOCON_HDR *hdr,
+   FILE             *fp);
 
 /*---------------------------------------------------------------------------*/
 /**
@@ -498,13 +492,13 @@ extern void geocon_dump_data(
  * at a time.
  */
 extern int geocon_forward(
-   GEOCON_HDR    *hdr,
-   int            interp,
-   double         deg_factor,
-   double         hgt_factor,
-   int            n,
-   GEOCON_COORD   coord[],
-   double         h[]);
+   const GEOCON_HDR *hdr,
+   int               interp,
+   double            deg_factor,
+   double            hgt_factor,
+   int               n,
+   GEOCON_COORD      coord[],
+   double            h[]);
 
 /*---------------------------------------------------------------------------*/
 /**
@@ -545,13 +539,13 @@ extern int geocon_forward(
  * at a time.
  */
 extern int geocon_inverse(
-   GEOCON_HDR    *hdr,
-   int            interp,
-   double         deg_factor,
-   double         hgt_factor,
-   int            n,
-   GEOCON_COORD   coord[],
-   double         h[]);
+   const GEOCON_HDR *hdr,
+   int               interp,
+   double            deg_factor,
+   double            hgt_factor,
+   int               n,
+   GEOCON_COORD      coord[],
+   double            h[]);
 
 /*---------------------------------------------------------------------------*/
 /**
@@ -595,14 +589,14 @@ extern int geocon_inverse(
  * at a time.
  */
 extern int geocon_transform(
-   GEOCON_HDR    *hdr,
-   int            interp,
-   double         deg_factor,
-   double         hgt_factor,
-   int            n,
-   GEOCON_COORD   coord[],
-   double         h[],
-   int            direction);
+   const GEOCON_HDR *hdr,
+   int               interp,
+   double            deg_factor,
+   double            hgt_factor,
+   int               n,
+   GEOCON_COORD      coord[],
+   double            h[],
+   int               direction);
 
 /*---------------------------------------------------------------------------*/
 

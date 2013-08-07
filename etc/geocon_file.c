@@ -41,8 +41,6 @@ static GEOCON_BOOL     dump_data = FALSE;                  /* -d           */
 static GEOCON_BOOL     read_data = FALSE;                  /* -d | -o file */
 static GEOCON_EXTENT   extent    = { 0 };                  /* -e ...       */
 static GEOCON_EXTENT * extptr    = GEOCON_NULL;            /* -e ...       */
-static GEOCON_EXTENT   extent_d  = { 0 };                  /* -E ...       */
-static GEOCON_EXTENT * extptr_d  = GEOCON_NULL;            /* -E ...       */
 static int             endian    = GEOCON_ENDIAN_INP_FILE; /* -B | -L | -N */
 
 static GEOCON_BOOL     do_title  = TRUE;
@@ -72,7 +70,6 @@ static void display_usage(int level)
 
       printf("  -o file    Specify output file\n");
       printf("  -e slat wlon nlat elon   Specify extent\n");
-      printf("  -E slat wlon nlat elon   Specify extent for data dump only\n");
    }
    else
    {
@@ -80,10 +77,7 @@ static void display_usage(int level)
          "Usage: %s [-h|-l] [-d] [-B|-L|-N] [-o file]\n",
          pgm);
       fprintf(stderr,
-         "       %*s [-e slat wlon nlat elon]\n",
-         (int)strlen(pgm), "");
-      fprintf(stderr,
-         "       %*s [-E slat wlon nlat elon] file ...\n",
+         "       %*s [-e slat wlon nlat elon] file ...\n",
          (int)strlen(pgm), "");
    }
 }
@@ -152,22 +146,6 @@ static int process_options(int argc, const char **argv)
          extent.nlat = atof( argv[++optcnt] );
          extent.elon = atof( argv[++optcnt] );
          extptr = &extent;
-      }
-
-      else if ( strcmp(arg, "E") == 0 )
-      {
-         if ( (optcnt+4) >= argc )
-         {
-            fprintf(stderr, "%s: option needs 4 arguments -- -%s\n",
-               pgm, "E");
-            display_usage(0);
-            exit(EXIT_FAILURE);
-         }
-         extent_d.slat = atof( argv[++optcnt] );
-         extent_d.wlon = atof( argv[++optcnt] );
-         extent_d.nlat = atof( argv[++optcnt] );
-         extent_d.elon = atof( argv[++optcnt] );
-         extptr_d = &extent_d;
       }
 
       else
@@ -247,7 +225,7 @@ static int process_file(const char *inpfile)
    if ( list_hdr  ) geocon_list_hdr (hdr, stdout, do_title),
                     do_title = FALSE;
    if ( dump_hdr  ) geocon_dump_hdr (hdr, stdout);
-   if ( dump_data ) geocon_dump_data(hdr, stdout, extptr_d);
+   if ( dump_data ) geocon_dump_data(hdr, stdout);
 
    /* Write out a new file if requested. */
 

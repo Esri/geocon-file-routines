@@ -28,7 +28,7 @@
 #include "libgeocon.h"
 #include "libgeocon.i"
 
-#define GEOCON_UNUSED_PARAMETER(p) (void)(p);
+#define GEOCON_UNUSED_PARAMETER(p) (void)(p)
 
 /* ------------------------------------------------------------------------- */
 /* floating-point comparison macros                                          */
@@ -1089,10 +1089,10 @@ static int gc_load_data(
  * write a binary file
  */
 static int gc_write_bin(
-   GEOCON_HDR *hdr,
-   const char *pathname,
-   int         byte_order,
-   int        *prc)
+   const GEOCON_HDR *hdr,
+   const char       *pathname,
+   int               byte_order,
+   int              *prc)
 {
    GEOCON_BOOL swap_data;
    FILE *fp;
@@ -1143,8 +1143,8 @@ static int gc_write_bin(
       {
          for (c = 0; c < hdr->ncols; c++)
          {
-            GEOCON_POINT   pt;
-            GEOCON_POINT * p;
+            GEOCON_POINT pt;
+            const GEOCON_POINT * p;
             int offset;
 
             /* get location of next point to write */
@@ -1165,7 +1165,7 @@ static int gc_write_bin(
             {
                pt = *p;
                p  = &pt;
-               gc_flip_point(p);
+               gc_flip_point(&pt);
             }
             fwrite(p, sizeof(*p), 1, fp);
          }
@@ -1180,9 +1180,9 @@ static int gc_write_bin(
  * write an ascii file
  */
 static int gc_write_asc(
-   GEOCON_HDR *hdr,
-   const char *pathname,
-   int        *prc)
+   const GEOCON_HDR *hdr,
+   const char       *pathname,
+   int              *prc)
 {
    FILE *fp;
 
@@ -1195,7 +1195,7 @@ static int gc_write_asc(
 
    /* write file header */
    {
-      GEOCON_FILE_HDR * fhdr = &hdr->fhdr;
+      const GEOCON_FILE_HDR * fhdr = &hdr->fhdr;
 
       fprintf(fp, "info             \"%s\"\n", fhdr->info            );
       fprintf(fp, "source           \"%s\"\n", fhdr->source          );
@@ -1247,7 +1247,7 @@ static int gc_write_asc(
          fprintf(fp, "\n");
          for (c = 0; c < hdr->ncols; c++)
          {
-            GEOCON_POINT * p;
+            const GEOCON_POINT * p;
             char buf_lat[24];
             char buf_lon[24];
             char buf_hgt[24];
@@ -1287,10 +1287,10 @@ static int gc_write_asc(
  * Get a lat/lon shift value (either from a file or from memory).
  */
 static void gc_get_shift_from_file(
-   GEOCON_HDR *   hdr,
-   GEOCON_POINT * pt,
-   int            irow,
-   int            icol)
+   const GEOCON_HDR * hdr,
+   GEOCON_POINT *     pt,
+   int                irow,
+   int                icol)
 {
    size_t nr = 0;
 
@@ -1338,10 +1338,10 @@ static void gc_get_shift_from_file(
 }
 
 static void gc_get_shift_from_data(
-   GEOCON_HDR *   hdr,
-   GEOCON_POINT * pt,
-   int            irow,
-   int            icol)
+   const GEOCON_HDR * hdr,
+   GEOCON_POINT *     pt,
+   int                irow,
+   int                icol)
 {
    int offset = (irow * hdr->ncols) + icol;
 
@@ -1349,10 +1349,10 @@ static void gc_get_shift_from_data(
 }
 
 static void gc_get_shift(
-   GEOCON_HDR *   hdr,
-   GEOCON_POINT * pt,
-   int            irow,
-   int            icol)
+   const GEOCON_HDR * hdr,
+   GEOCON_POINT *     pt,
+   int                irow,
+   int                icol)
 {
    if ( irow < 0 || irow >= hdr->nrows ||
         icol < 0 || icol >= hdr->ncols )
@@ -1385,7 +1385,7 @@ static void gc_get_shift(
  * calculate the shifts for a point using bilinear interpolation
  */
 static void gc_calculate_shifts_bilinear(
-   GEOCON_HDR * hdr,
+   const GEOCON_HDR * hdr,
    double       lat_deg,
    double       lon_deg,
    double *     lat_shift,
@@ -1473,7 +1473,7 @@ static void gc_calculate_shifts_bilinear(
  * calculate the shifts for a point using bicubic interpolation
  */
 static void gc_calculate_shifts_bicubic(
-   GEOCON_HDR * hdr,
+   const GEOCON_HDR * hdr,
    double       lat_deg,
    double       lon_deg,
    double *     lat_shift,
@@ -1628,7 +1628,7 @@ static void gc_calculate_shifts_bicubic(
  * calculate the shifts for a point using biquadratic interpolation
  */
 static void gc_calculate_shifts_biquadratic(
-   GEOCON_HDR * hdr,
+   const GEOCON_HDR * hdr,
    double       lat_deg,
    double       lon_deg,
    double *     lat_shift,
@@ -1801,7 +1801,7 @@ static void gc_calculate_shifts_biquadratic(
  * calculate the shifts for a point using natural spline interpolation
  */
 static void gc_calculate_shifts_natspline(
-   GEOCON_HDR * hdr,
+   const GEOCON_HDR * hdr,
    double       lat_deg,
    double       lon_deg,
    double *     lat_shift,
@@ -1944,7 +1944,7 @@ static void gc_calculate_shifts_natspline(
  * doing any interpolation, in order to preserve accuracy.
  */
 static void gc_calculate_shifts(
-   GEOCON_HDR * hdr,
+   const GEOCON_HDR * hdr,
    int          interp,
    double       lat_deg,
    double       lon_deg,
@@ -2156,10 +2156,10 @@ GEOCON_HDR * geocon_load(
  * write a geocon file
  */
 int geocon_write(
-   GEOCON_HDR *hdr,
-   const char *pathname,
-   int         byte_order,
-   int        *prc)
+   const GEOCON_HDR *hdr,
+   const char       *pathname,
+   int               byte_order,
+   int              *prc)
 {
    int filetype;
    int gcerr;
@@ -2212,9 +2212,9 @@ void geocon_delete(
  * dump a header in list format
  */
 void geocon_list_hdr(
-   GEOCON_HDR *hdr,
-   FILE       *fp,
-   GEOCON_BOOL     do_hdr_line)
+   const GEOCON_HDR *hdr,
+   FILE             *fp,
+   GEOCON_BOOL       do_hdr_line)
 {
    if ( hdr != GEOCON_NULL && fp != GEOCON_NULL )
    {
@@ -2251,8 +2251,8 @@ void geocon_list_hdr(
  * dump a header
  */
 void geocon_dump_hdr(
-   GEOCON_HDR *hdr,
-   FILE       *fp)
+   const GEOCON_HDR *hdr,
+   FILE             *fp)
 {
    if ( hdr != GEOCON_NULL && fp != GEOCON_NULL )
    {
@@ -2307,48 +2307,36 @@ void geocon_dump_hdr(
  * dump all data
  */
 void geocon_dump_data(
-   GEOCON_HDR   *hdr,
-   FILE          *fp,
-   GEOCON_EXTENT *ext)
+   const GEOCON_HDR *hdr,
+   FILE             *fp)
 {
    if ( hdr != GEOCON_NULL && fp != GEOCON_NULL && hdr->points != GEOCON_NULL )
    {
-      int skip_south = 0;
-      int skip_north = 0;
-      int skip_west  = 0;
-      int skip_east  = 0;
-      int rc;
+      int c;
+      int r;
 
-      rc = gc_adjust_extent(hdr, ext,
-         &skip_south, &skip_north, &skip_west, &skip_east, FALSE, GEOCON_NULL);
-      if ( rc == 0 )
+      for (r = 0; r < hdr->nrows; r++)
       {
-         int c;
-         int r;
+         GEOCON_POINT * p = hdr->points + (r * hdr->ncols);
+         double lat = hdr->lat_min + (r * hdr->lat_delta);
+         double lon = hdr->lon_min;
 
-         for (r = skip_south; r < (hdr->nrows - skip_north); r++)
+         fprintf(fp,
+            "     lat       lon  "
+            "       lat-shift         lon-shift         hgt-shift\n");
+         fprintf(fp,
+            "--------  --------  "
+            "----------------  ----------------  ----------------\n");
+
+         for (c = 0; c < hdr->ncols; c++)
          {
-            GEOCON_POINT * p = hdr->points + ((r * hdr->ncols) + skip_west);
-            double lat = hdr->lat_min + (r         * hdr->lat_delta);
-            double lon = hdr->lon_min + (skip_west * hdr->lon_delta);
-
-            fprintf(fp,
-               "     lat       lon  "
-               "       lat-shift         lon-shift         hgt-shift\n");
-            fprintf(fp,
-               "--------  --------  "
-               "----------------  ----------------  ----------------\n");
-
-            for (c = skip_west; c < (hdr->ncols - skip_east); c++)
-            {
-               fprintf(fp, "%8.3f  %8.3f  %16.9f  %16.9f  %16.9f\n",
-                  lat, lon, p->lat_value, p->lon_value, p->hgt_value);
-               lon += hdr->lon_delta;
-               p++;
-            }
-
-            fprintf(fp, "\n");
+            fprintf(fp, "%8.3f  %8.3f  %16.9f  %16.9f  %16.9f\n",
+               lat, lon, p->lat_value, p->lon_value, p->hgt_value);
+            lon += hdr->lon_delta;
+            p++;
          }
+
+         fprintf(fp, "\n");
       }
    }
 }
@@ -2357,13 +2345,13 @@ void geocon_dump_data(
  * do a forward transformation of points
  */
 int geocon_forward(
-   GEOCON_HDR    *hdr,
-   int            interp,
-   double         deg_factor,
-   double         hgt_factor,
-   int            n,
-   GEOCON_COORD   coord[],
-   double         h[])
+   const GEOCON_HDR *hdr,
+   int               interp,
+   double            deg_factor,
+   double            hgt_factor,
+   int               n,
+   GEOCON_COORD      coord[],
+   double            h[])
 {
    int num = 0;
    int i;
@@ -2419,13 +2407,13 @@ int geocon_forward(
 #endif
 
 int geocon_inverse(
-   GEOCON_HDR    *hdr,
-   int            interp,
-   double         deg_factor,
-   double         hgt_factor,
-   int            n,
-   GEOCON_COORD   coord[],
-   double         h[])
+   const GEOCON_HDR *hdr,
+   int               interp,
+   double            deg_factor,
+   double            hgt_factor,
+   int               n,
+   GEOCON_COORD      coord[],
+   double            h[])
 {
    int max_iterations = MAX_ITERATIONS;
    int num = 0;
@@ -2528,14 +2516,14 @@ int geocon_inverse(
  * do a forward/inverse transformation of points
  */
 int geocon_transform(
-   GEOCON_HDR    *hdr,
-   int            interp,
-   double         deg_factor,
-   double         hgt_factor,
-   int            n,
-   GEOCON_COORD   coord[],
-   double         h[],
-   int            direction)
+   const GEOCON_HDR *hdr,
+   int               interp,
+   double            deg_factor,
+   double            hgt_factor,
+   int               n,
+   GEOCON_COORD      coord[],
+   double            h[],
+   int               direction)
 {
    if ( direction == GEOCON_CVT_FORWARD )
       return geocon_forward(hdr, interp, deg_factor, hgt_factor, n, coord, h);
