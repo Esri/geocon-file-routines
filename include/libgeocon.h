@@ -489,7 +489,7 @@ extern void geocon_dump_data(
  * they are outside of the grid) are left unchanged.  However, there
  * is no indication of which points were changed and which were not.
  * If you need that information, then call this routine with one point
- * at a time.
+ * at a time. The overhead for doing that is minimal.
  */
 extern int geocon_forward(
    const GEOCON_HDR *hdr,
@@ -536,7 +536,7 @@ extern int geocon_forward(
  * they are outside of the grid) are left unchanged.  However, there
  * is no indication of which points were changed and which were not.
  * If you need that information, then call this routine with one point
- * at a time.
+ * at a time. The overhead for doing that is minimal.
  */
 extern int geocon_inverse(
    const GEOCON_HDR *hdr,
@@ -586,7 +586,7 @@ extern int geocon_inverse(
  * they are outside of the grid) are left unchanged.  However, there
  * is no indication of which points were changed and which were not.
  * If you need that information, then call this routine with one point
- * at a time.
+ * at a time. The overhead for doing that is minimal.
  */
 extern int geocon_transform(
    const GEOCON_HDR *hdr,

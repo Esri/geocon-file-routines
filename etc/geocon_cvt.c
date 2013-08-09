@@ -215,7 +215,7 @@ static int process_options(int argc, const char **argv)
    if ( pgm == GEOCON_NULL )  pgm = argv[0];
    else                       pgm++;
 
-   decimal_pt = localeconv()->decimal_point[0]; 
+   decimal_pt = localeconv()->decimal_point[0];
 
    for (optcnt = 1; optcnt < argc; optcnt++)
    {

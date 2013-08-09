@@ -82,17 +82,17 @@ struct gchdr
 typedef struct cvt_info CVT_INFO;
 struct cvt_info
 {
-   char info      [GEOCON_HDR_INFO_LEN];    /* File info                     */
-   char source    [GEOCON_HDR_INFO_LEN];    /* Source of info                */
-   char date      [GEOCON_HDR_DATE_LEN];    /* Date "YYYY-MM-DD"             */
-   char from_gcs  [GEOCON_HDR_NAME_LEN];    /* From GCS name                 */
-   char to_gcs    [GEOCON_HDR_NAME_LEN];    /* To   GCS name                 */
+   char info     [GEOCON_HDR_INFO_LEN];    /* File info                     */
+   char source   [GEOCON_HDR_INFO_LEN];    /* Source of info                */
+   char date     [GEOCON_HDR_DATE_LEN];    /* Date "YYYY-MM-DD"             */
+   char from_gcs [GEOCON_HDR_NAME_LEN];    /* From GCS name                 */
+   char to_gcs   [GEOCON_HDR_NAME_LEN];    /* To   GCS name                 */
 
-   char out_file  [GEOCON_MAX_PATH_LEN];    /* Name of output GEOCON    file */
+   char out_file [GEOCON_MAX_PATH_LEN];    /* Name of output GEOCON    file */
 
-   char lat_file  [GEOCON_MAX_PATH_LEN];    /* Name of input  latitude  file */
-   char lon_file  [GEOCON_MAX_PATH_LEN];    /* Name of input  longitude file */
-   char hgt_file  [GEOCON_MAX_PATH_LEN];    /* Name of input  height    file */
+   char lat_file [GEOCON_MAX_PATH_LEN];    /* Name of input  latitude  file */
+   char lon_file [GEOCON_MAX_PATH_LEN];    /* Name of input  longitude file */
+   char hgt_file [GEOCON_MAX_PATH_LEN];    /* Name of input  height    file */
 };
 
 /*------------------------------------------------------------------------
@@ -110,7 +110,7 @@ static void display_usage(int level)
       printf("  -B         Write    big-endian binary file\n");
       printf("  -L         Write little-endian binary file\n");
       printf("  -N         Write native-endian binary file\n");
-      printf("               (default is same as input file)\n");
+      printf("             (default is same as input  file)\n");
    }
    else
    {
@@ -146,9 +146,9 @@ static int process_options(int argc, const char **argv)
          exit(EXIT_SUCCESS);
       }
 
-      else if ( strcmp(arg, "B") == 0 ) endian     = GEOCON_ENDIAN_BIG;
-      else if ( strcmp(arg, "L") == 0 ) endian     = GEOCON_ENDIAN_LITTLE;
-      else if ( strcmp(arg, "N") == 0 ) endian     = GEOCON_ENDIAN_NATIVE;
+      else if ( strcmp(arg, "B") == 0 ) endian = GEOCON_ENDIAN_BIG;
+      else if ( strcmp(arg, "L") == 0 ) endian = GEOCON_ENDIAN_LITTLE;
+      else if ( strcmp(arg, "N") == 0 ) endian = GEOCON_ENDIAN_NATIVE;
 
       else
       {
@@ -185,25 +185,17 @@ static char * strip(char *str)
    return str;
 }
 
-static char * strip_buf(char *str)
-{
-   char * s = strip(str);
-
-   if ( s > str )
-      strcpy(str, s);
-   return str;
-}
-
 /*------------------------------------------------------------------------
  * load conversion info from the conversion file
  */
 static int get_cvt_info(const char *cvtfile, CVT_INFO *ci)
 {
    FILE * fp = fopen(cvtfile, "r");
-   char buf[1024];
-   int  len;
-   int  size;
-   int  rc = 0;
+   char   buf[1024];
+   char * b;
+   int    len;
+   int    size;
+   int    rc = 0;
 
    if ( fp == GEOCON_NULL )
    {
@@ -216,12 +208,18 @@ static int get_cvt_info(const char *cvtfile, CVT_INFO *ci)
    if ( feof(fp) )                                                       \
    {                                                                     \
       printf("%s: Unexpected EOF reading field \"%s\"\n", cvtfile, #f);  \
+      return -1;                                                         \
+   }                                                                     \
+   b    = strip(buf);                                                    \
+   size = (int)sizeof(ci->f);                                            \
+   len  = (int)strlen(b);                                                \
+   if ( len == 0 )                                                       \
+   {                                                                     \
+      printf("%s: Field \"%s\" is empty\n",                              \
+         cvtfile, #f);                                                   \
       rc = -1;                                                           \
    }                                                                     \
-   strip_buf(buf);                                                       \
-   size = (int)sizeof(ci->f);                                            \
-   len  = (int)strlen(buf);                                              \
-   if ( len >= size )                                                    \
+   else if ( len >= size )                                               \
    {                                                                     \
       printf("%s: Field \"%s\" too long: %d, max is %d\n",               \
          cvtfile, #f, len, size);                                        \
@@ -229,7 +227,7 @@ static int get_cvt_info(const char *cvtfile, CVT_INFO *ci)
    }                                                                     \
    else                                                                  \
    {                                                                     \
-      strcpy(ci->f, buf);                                                \
+      strcpy(ci->f, b);                                                  \
    }
 
    RD_CI( info     );
@@ -514,6 +512,7 @@ static int process_file(const char *inpfile)
    hdr = load_cvt_info(inpfile);
    if ( hdr == GEOCON_NULL )
    {
+      /* error msg already output */
       return -1;
    }
 
