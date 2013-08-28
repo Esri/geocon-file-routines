@@ -813,7 +813,7 @@ static int process_8086(
  *
  * If a line contains only two values, then the height is assumed to be zero.
  *
- * If the decimal point character is not a comma (which is true in the US),
+ * If the decimal point character is not a comma (which it is not in the US),
  * then any commas in the line will be converted to spaces.
  */
 static int process_file(
