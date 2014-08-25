@@ -20,7 +20,7 @@ The NGS tools also contain error files, documentation files, and programs
 for transforming points.
 
 For further information about the NGS GEOCON tools, go to
-[here](http://beta.ngs.noaa.gov/GEOCON/).
+[here](http://www.ngs.noaa.gov/GEOCON/).
 
 The purposes of this package is to provide the following:
 
@@ -253,6 +253,7 @@ Rules for ascii files are:
 
    4.  Any string value longer than the field width is silently truncated.
        Maximum field withs are:
+
           info      79 chars
           source    79 chars
           date      23 chars
@@ -566,7 +567,7 @@ https://raw.github.com/Esri/geocon-file-routines/master/doc/html/index.html).
 
 ### Resources
 
-* [NGS GEOCON site](http://beta.ngs.noaa.gov/GEOCON/)
+* [NGS GEOCON Page](http://www.ngs.noaa.gov/GEOCON/)
 
 ### Issues
 
